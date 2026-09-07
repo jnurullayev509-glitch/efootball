@@ -367,7 +367,48 @@ data-tab="admin"
 id="home"
 class="active"
 >
+<div class="card" id="registrationCard" style="display:none">
 
+  <h3>📝 Ligaga ro‘yxatdan o‘tish</h3>
+
+  <p class="small">
+    Telegram username:
+    <b id="registrationUsername">@username</b>
+  </p>
+
+  <p class="small">
+    O‘zingizga bitta jamoani tanlang. Tanlangan jamoani boshqa
+    ishtirokchi tanlay olmaydi.
+  </p>
+
+  <input
+    id="regName"
+    placeholder="Ismingiz"
+    maxlength="50"
+  >
+
+  <br><br>
+
+  <select id="regTeam">
+    <option value="">⚽ Jamoani tanlang</option>
+  </select>
+
+  <br><br>
+
+  <button
+    class="good"
+    onclick="registerParticipant()"
+  >
+    ⚽ Ro‘yxatdan o‘tish
+  </button>
+
+  <div
+    id="registrationStatus"
+    class="small"
+    style="margin-top:12px"
+  ></div>
+
+</div>
 <div class="hero">
 
 <h2>
@@ -1085,8 +1126,290 @@ new Option(team,team)
 );
 
 }
+async function registerParticipant() {
 
+  if (!MY_USERNAME) {
+    alert(
+      "Telegram username topilmadi.\n\n" +
+      "Avval Telegram profilingizga @username qo‘ying."
+    );
+    return;
+  }
 
+  const name =
+    String(
+      document.getElementById("regName")?.value || ""
+    ).trim();
+
+  const team =
+    String(
+      document.getElementById("regTeam")?.value || ""
+    ).trim();
+
+  if (!name) {
+    alert("Iltimos, ismingizni kiriting.");
+    return;
+  }
+
+  if (!team) {
+    alert("Iltimos, jamoani tanlang.");
+    return;
+  }
+
+  const button =
+    document.querySelector(
+      "#registrationCard button"
+    );
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "⏳ Saqlanmoqda...";
+  }
+
+  try {
+
+    const response = await fetch("/api/state", {
+      method: "PUT",
+
+      headers: {
+        "Content-Type": "application/json",
+        "X-Telegram-Init-Data":
+          TG?.initData || ""
+      },
+
+      body: JSON.stringify({
+        action: "register",
+        name,
+        team
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+        "Ro‘yxatdan o‘tishda xatolik yuz berdi."
+      );
+    }
+
+    alert(
+      `✅ Ro‘yxatdan o‘tish muvaffaqiyatli!\n\n` +
+      `👤 ${name}\n` +
+      `⚽ ${team}\n` +
+      `@${MY_USERNAME}`
+    );
+
+    /*
+     * Serverdagi yangi holatni qayta yuklaymiz.
+     */
+
+    await loadState();
+
+    render();
+
+  } catch (error) {
+
+    console.error(
+      "REGISTRATION ERROR:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Ro‘yxatdan o‘tishda xatolik yuz berdi."
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.textContent =
+        "⚽ Ro‘yxatdan o‘tish";
+    }
+
+  }
+                              }
+function renderRegistration() {
+
+  const card =
+    document.getElementById(
+      "registrationCard"
+    );
+
+  if (!card) return;
+
+  /*
+   * Admin uchun ro‘yxatdan o‘tish oynasi kerak emas.
+   */
+
+  if (ADMIN) {
+    card.style.display = "none";
+    return;
+  }
+
+  /*
+   * Telegram username bo‘lmasa,
+   * ro‘yxatdan o'tkazmaymiz.
+   */
+
+  if (!MY_USERNAME) {
+
+    card.style.display = "block";
+
+    const status =
+      document.getElementById(
+        "registrationStatus"
+      );
+
+    if (status) {
+      status.innerHTML =
+        "⚠️ Telegram profilingizga " +
+        "<b>@username</b> qo‘yishingiz kerak.";
+    }
+
+    return;
+  }
+
+  /*
+   * Bu username oldin ro‘yxatdan o'tganmi?
+   */
+
+  const myEntry =
+    Object.entries(
+      d.players || {}
+    ).find(
+      ([, player]) =>
+        String(player?.username || "")
+          .trim()
+          .toLowerCase()
+          .replace(/^@/, "") === MY_USERNAME
+    );
+
+  if (myEntry) {
+
+    const myTeam = myEntry[0];
+    const player = myEntry[1];
+
+    card.style.display = "block";
+
+    const status =
+      document.getElementById(
+        "registrationStatus"
+      );
+
+    if (status) {
+
+      status.innerHTML =
+        `✅ Siz ro‘yxatdan o‘tgansiz.<br>` +
+        `⚽ Jamoangiz: <b>${myTeam}</b>`;
+    }
+
+    const nameInput =
+      document.getElementById("regName");
+
+    const teamSelect =
+      document.getElementById("regTeam");
+
+    if (nameInput) {
+      nameInput.value =
+        player?.name || "";
+      nameInput.disabled = true;
+    }
+
+    if (teamSelect) {
+      teamSelect.innerHTML =
+        `<option value="${myTeam}">${myTeam}</option>`;
+      teamSelect.disabled = true;
+    }
+
+    const button =
+      card.querySelector("button");
+
+    if (button) {
+      button.style.display = "none";
+    }
+
+    return;
+  }
+
+  /*
+   * Hali ro‘yxatdan o'tmagan.
+   * Faqat bo‘sh jamoalarni ko‘rsatamiz.
+   */
+
+  card.style.display = "block";
+
+  const nameInput =
+    document.getElementById("regName");
+
+  const teamSelect =
+    document.getElementById("regTeam");
+
+  const status =
+    document.getElementById(
+      "registrationStatus"
+    );
+
+  if (nameInput) {
+    nameInput.disabled = false;
+
+    if (!nameInput.value) {
+      const firstName =
+        String(U?.first_name || "").trim();
+
+      const lastName =
+        String(U?.last_name || "").trim();
+
+      nameInput.value =
+        `${firstName} ${lastName}`.trim();
+    }
+  }
+
+  if (teamSelect) {
+
+    const takenTeams =
+      new Set(
+        Object.keys(d.players || {})
+      );
+
+    const availableTeams =
+      TEAMS.filter(
+        team => !takenTeams.has(team)
+      );
+
+    teamSelect.innerHTML =
+      `<option value="">⚽ Jamoani tanlang</option>` +
+      availableTeams
+        .map(
+          team =>
+            `<option value="${team}">${team}</option>`
+        )
+        .join("");
+
+    teamSelect.disabled =
+      availableTeams.length === 0;
+  }
+
+  if (status) {
+
+    const count =
+      Object.keys(
+        d.players || {}
+      ).length;
+
+    status.innerHTML =
+      `👥 Ro‘yxatdan o‘tganlar: ` +
+      `<b>${count}/20</b>`;
+  }
+
+  const button =
+    card.querySelector("button");
+
+  if (button) {
+    button.style.display = "block";
+  }
+     }
 /* =========================
    INIT
 ========================= */
@@ -2333,6 +2656,8 @@ deadline.value=value;
 ========================= */
 
 function render(){
+
+renderRegistration();
 
 renderTable();
 
