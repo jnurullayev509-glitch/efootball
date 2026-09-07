@@ -67,6 +67,57 @@ async function result(){if(!ADMIN)return alert('Admin huquqi kerak');let r=+rr.v
 function calc(){let s={};TEAMS.forEach(t=>s[t]={t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});Object.values(d.results).forEach(x=>{let h=s[x.h],a=s[x.a];h.p++;a.p++;h.gf+=x.x;h.ga+=x.y;a.gf+=x.y;a.ga+=x.x;if(x.x>x.y){h.w++;a.l++;h.pts+=3}else if(x.x<x.y){a.w++;h.l++;a.pts+=3}else{h.d++;a.d++;h.pts++;a.pts++}});return Object.values(s).map(x=>({...x,gd:x.gf-x.ga})).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf)}
 function renderTable(){standings.innerHTML=calc().map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.t}</b></td><td>${x.p}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gf}</td><td>${x.ga}</td><td>${x.gd}</td><td><b>${x.pts}</b></td></tr>`).join('')}
 function renderRound(){let r=+round.value;matches.innerHTML='<h3>'+(r+1)+'-tur</h3>'+FIXTURES[r].map(([h,a])=>{let x=d.results[r+'|'+h+'|'+a];return `<div class="fixture"><b>${h}</b><span class="score">${x?x.x+':'+x.y:'—'}</span><b class="away">${a}</b></div>`}).join('')}
-function renderTeams(){teamlist.innerHTML=TEAMS.map(t=>`<div class="card"><b>${t}</b><div class="small">${d.players[t]?'👤 '+d.players[t].name:'Bo‘sh'}</div></div>`).join(''); if(ADMIN) plist.innerHTML=TEAMS.filter(t=>d.players[t]).map(t=>`<p><b>${t}</b> — ${d.players[t].name}</p>`).join('')||'<span class="small">Hali ishtirokchi yo‘q</span>'}
+function renderTeams(){
+  teamlist.innerHTML=TEAMS.map(t=>`
+    <div class="card">
+      <b>${esc(t)}</b>
+      <div class="small">
+        ${d.players[t]?'👤 '+esc(d.players[t].name):'Bo‘sh'}
+      </div>
+    </div>
+  `).join('');
+}function esc(s){
+  return String(s??'').replace(/[&<>"']/g,m=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+
+function renderParticipants(){
+  if(!ADMIN||!participants)return;
+
+  const users=Object.values(d.users||{});
+
+  if(!users.length){
+    participants.innerHTML=
+      '<span class="small">Hali ishtirokchi Mini Appni ochmagan</span>';
+    return;
+  }
+
+  participants.innerHTML=users.map(u=>{
+    const id=String(u.id);
+    const team=u.team||'';
+
+    return `
+      <div class="card">
+        <b>${esc(u.username||'Username yo‘q')}</b>
+        <div class="small">${esc(u.name||'')}</div>
+
+        <select onchange="assignUser('${id}',this.value)">
+          <option value="">Jamoani tanlang</option>
+
+          ${TEAMS.map(t=>`
+            <option value="${esc(t)}" ${t===team?'selected':''}>
+              ${esc(t)}
+            </option>
+          `).join('')}
+        </select>
+      </div>
+    `;
+  }).join('');
+}
 function recent(){let a=Object.values(d.results).slice(-8).reverse();played.textContent=Object.keys(d.results).length+' ta o‘yin';recent.innerHTML=a.map(x=>`<p>${x.h} — ${x.a} <b>${x.x}:${x.y}</b></p>`).join('')||'<span class="small">Natija kiritilmagan</span>'} function render(){renderTable();renderRound();renderTeams();recent()} async function clearResults(){if(confirm('Barcha natijalar o‘chirilsinmi?')){d.results={};await save();render()}} init(); loadState();
 </script></body></html>
