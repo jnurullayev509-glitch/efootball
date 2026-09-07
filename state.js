@@ -8,7 +8,6 @@ function verifyTelegram(initData) {
 
   const params = new URLSearchParams(initData);
   const hash = params.get('hash');
-
   if (!hash) return null;
 
   params.delete('hash');
@@ -28,19 +27,15 @@ function verifyTelegram(initData) {
     .update(dataCheckString)
     .digest('hex');
 
-  if (calculated.length !== hash.length) return null;
-
   if (
+    calculated.length !== hash.length ||
     !crypto.timingSafeEqual(
       Buffer.from(calculated),
       Buffer.from(hash)
     )
-  ) {
-    return null;
-  }
+  ) return null;
 
   const userRaw = params.get('user');
-
   if (!userRaw) return null;
 
   try {
@@ -61,97 +56,60 @@ async function readState() {
 
   if (!blob) {
     return {
-      users: {},
       players: {},
-      results: {}
+      results: {},
+      chats: {},
+      deadline: '00:00'
     };
   }
 
-  const r = await fetch(blob.url, {
-    cache: 'no-store'
-  });
+  const r = await fetch(blob.url, { cache: 'no-store' });
 
   if (!r.ok) {
     return {
-      users: {},
       players: {},
-      results: {}
+      results: {},
+      chats: {},
+      deadline: '00:00'
     };
   }
 
-  const state = await r.json();
-
-  if (!state.users) state.users = {};
-  if (!state.players) state.players = {};
-  if (!state.results) state.results = {};
-
-  return state;
+  return await r.json();
 }
 
-async function writeState(state) {
-  return await put(
-    PATH,
-    JSON.stringify(state),
-    {
-      access: 'public',
-      addRandomSuffix: false,
-      contentType: 'application/json',
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      allowOverwrite: true
-    }
+function username(user) {
+  return String(user?.username || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, '');
+}
+
+function isAdmin(user) {
+  const admins = String(process.env.ADMIN_IDS || '')
+    .split(',')
+    .map(x => x.trim())
+    .filter(Boolean);
+
+  return admins.includes(String(user?.id));
+}
+
+function isParticipant(user, state) {
+  const u = username(user);
+
+  if (!u) return false;
+
+  return Object.values(state.players || {}).some(
+    p => username({ username: p.username }) === u
   );
 }
 
 export default async function handler(req, res) {
   try {
-
-    // =========================
-    // GET — ma'lumotlarni olish
-    // =========================
     if (req.method === 'GET') {
       const state = await readState();
       return res.status(200).json(state);
     }
 
-    // ==========================================
-    // POST — Mini App ochgan foydalanuvchini yozish
-    // ==========================================
-    if (req.method === 'POST') {
-
-      const user = verifyTelegram(
-        req.headers['x-telegram-init-data']
-      );
-
-      if (!user) {
-        return res.status(401).json({
-          error: 'Telegram authentication failed'
-        });
-      }
-
-      const state = await readState();
-
-      const id = String(user.id);
-
-      state.users[id] = {
-        id: id,
-        username: user.username || '',
-        name: [user.first_name, user.last_name]
-          .filter(Boolean)
-          .join(' '),
-        team: state.users[id]?.team || ''
-      };
-
-      await writeState(state);
-
-      return res.status(200).json({
-        ok: true,
-        user: state.users[id]
-      });
-    }
-
-    // =========================
-    // PUT — faqat admin
-    // =========================
     if (req.method !== 'PUT') {
       return res.status(405).json({
         error: 'Method not allowed'
@@ -168,17 +126,6 @@ export default async function handler(req, res) {
       });
     }
 
-    const admins = String(process.env.ADMIN_IDS || '')
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean);
-
-    if (!admins.includes(String(user.id))) {
-      return res.status(403).json({
-        error: 'Admin only'
-      });
-    }
-
     const state =
       typeof req.body === 'string'
         ? JSON.parse(req.body)
@@ -190,11 +137,33 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!state.users) state.users = {};
-    if (!state.players) state.players = {};
-    if (!state.results) state.results = {};
+    const admin = isAdmin(user);
+    const participant = isParticipant(user, state);
 
-    const blob = await writeState(state);
+    if (!admin && !participant) {
+      return res.status(403).json({
+        error: 'Siz ro‘yxatdan o‘tgan ishtirokchi emassiz'
+      });
+    }
+
+    const current = await readState();
+
+    if (!admin) {
+      state.players = current.players || {};
+      state.deadline = current.deadline || '00:00';
+    }
+
+    const blob = await put(
+      PATH,
+      JSON.stringify(state),
+      {
+        access: 'public',
+        addRandomSuffix: false,
+        contentType: 'application/json',
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        allowOverwrite: true
+      }
+    );
 
     return res.status(200).json({
       ok: true,
@@ -202,7 +171,6 @@ export default async function handler(req, res) {
     });
 
   } catch (e) {
-
     console.error(e);
 
     return res.status(500).json({
