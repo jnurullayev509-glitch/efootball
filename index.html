@@ -119,5 +119,11 @@ function renderParticipants(){
     `;
   }).join('');
 }
-function recent(){let a=Object.values(d.results).slice(-8).reverse();played.textContent=Object.keys(d.results).length+' ta o‘yin';recent.innerHTML=a.map(x=>`<p>${x.h} — ${x.a} <b>${x.x}:${x.y}</b></p>`).join('')||'<span class="small">Natija kiritilmagan</span>'} function render(){renderTable();renderRound();renderTeams();recent()} async function clearResults(){if(confirm('Barcha natijalar o‘chirilsinmi?')){d.results={};await save();render()}} init(); loadState();
+function recent(){let a=Object.values(d.results).slice(-8).reverse();played.textContent=Object.keys(d.results).length+' ta o‘yin';recent.innerHTML=a.map(x=>`<p>${x.h} — ${x.a} <b>${x.x}:${x.y}</b></p>`).join('')||'<span class="small">Natija kiritilmagan</span>'} function render(){
+  renderTable();
+  renderRound();
+  renderTeams();
+  renderParticipants();
+  recent();
+} async function clearResults(){if(confirm('Barcha natijalar o‘chirilsinmi?')){d.results={};await save();render()}} init(); loadState();
 </script></body></html>
