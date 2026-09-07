@@ -1,11 +1,23 @@
 <!doctype html>
-
 <html lang="uz">
 <head>
+
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>eFootball Premier League</title><script src="https://telegram.org/js/telegram-web-app.js"></script><style>
-*{box-sizing:border-box}
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1"
+>
+
+<title>eFootball Premier League</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+*{
+box-sizing:border-box
+}
 
 body{
 margin:0;
@@ -19,7 +31,7 @@ padding:18px;
 background:#151c35;
 position:sticky;
 top:0;
-z-index:10
+z-index:20
 }
 
 h1{
@@ -40,15 +52,19 @@ padding:10px;
 background:#11172c;
 position:sticky;
 top:68px;
-z-index:9
+z-index:19
 }
 
-button,select,input,textarea{
+button,
+select,
+input,
+textarea{
 border:0;
 border-radius:9px;
 padding:10px;
 background:#252e50;
-color:#fff
+color:#fff;
+font-size:14px
 }
 
 button{
@@ -61,7 +77,7 @@ background:#5865f2
 }
 
 main{
-max-width:900px;
+max-width:950px;
 margin:auto;
 padding:12px
 }
@@ -74,7 +90,8 @@ section.active{
 display:block
 }
 
-.card,.hero{
+.card,
+.hero{
 background:#151c35;
 border:1px solid #293354;
 border-radius:14px;
@@ -83,16 +100,24 @@ margin-bottom:12px
 }
 
 .hero{
-background:linear-gradient(135deg,#242d5b,#171c35)
+background:
+linear-gradient(
+135deg,
+#242d5b,
+#171c35
+)
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+grid-template-columns:
+repeat(auto-fit,minmax(150px,1fr));
 gap:9px
 }
 
-.grid input,.grid select,.grid textarea{
+.grid input,
+.grid select,
+.grid textarea{
 width:100%
 }
 
@@ -104,20 +129,24 @@ font-size:12px
 
 th,td{
 padding:8px 4px;
-border-bottom:1px solid #293354;
+border-bottom:
+1px solid #293354;
 text-align:center
 }
 
-td:nth-child(2),th:nth-child(2){
+td:nth-child(2),
+th:nth-child(2){
 text-align:left
 }
 
 .fixture{
 display:grid;
-grid-template-columns:1fr 60px 1fr;
-padding:10px 0;
-border-bottom:1px solid #293354;
-align-items:center
+grid-template-columns:
+1fr 65px 1fr;
+align-items:center;
+padding:12px 0;
+border-bottom:
+1px solid #293354
 }
 
 .away{
@@ -126,6 +155,7 @@ text-align:right
 
 .score{
 text-align:center;
+font-size:18px;
 font-weight:bold
 }
 
@@ -156,12 +186,12 @@ gap:10px
 }
 
 .logo{
-width:42px;
-height:42px;
-border-radius:50%;
+width:45px;
+height:45px;
 object-fit:contain;
+border-radius:50%;
 background:#fff;
-padding:3px
+padding:4px
 }
 
 .team-name{
@@ -175,15 +205,23 @@ padding:12px;
 margin:10px 0
 }
 
+.player-box{
+background:#11172c;
+border-radius:10px;
+padding:10px;
+margin-top:8px
+}
+
 .chat{
-margin-top:10px;
-border-top:1px solid #293354;
-padding-top:10px
+margin-top:12px;
+padding-top:12px;
+border-top:
+1px solid #293354
 }
 
 .chat-messages{
-max-height:220px;
-overflow:auto;
+max-height:230px;
+overflow-y:auto;
 margin-bottom:8px
 }
 
@@ -191,21 +229,26 @@ margin-bottom:8px
 background:#252e50;
 padding:8px;
 border-radius:8px;
-margin:5px 0
+margin:6px 0
 }
 
 .message b{
-font-size:12px
+font-size:11px
+}
+
+.message-text{
+margin-top:3px;
+word-break:break-word
 }
 
 textarea{
 resize:none;
-min-height:70px
+min-height:65px
 }
 
 .badge{
 display:inline-block;
-padding:5px 8px;
+padding:5px 9px;
 border-radius:20px;
 background:#252e50;
 font-size:11px
@@ -221,41 +264,220 @@ color:#aeb9dd;
 font-size:13px;
 padding:10px 0
 }
-</style></head><body><header>
-<h1>⚽ eFootball Premier League</h1>
-<div class="sub" id="userLine">Telegram...</div>
-</header><nav>
-<button class="tab active" data-tab="home">Bosh sahifa</button>
-<button class="tab" data-tab="table">Jadval</button>
-<button class="tab" data-tab="rounds">Turlar</button>
-<button class="tab" data-tab="teams">Jamoalar</button>
-<button class="tab admin-only" data-tab="admin">⚙️ Admin</button>
-</nav><main><section id="home" class="active"><div class="hero">
-<h2>2026/27 mavsum</h2><p class="small">
-20 jamoa · 38 tur · 380 ta o‘yin
-</p><p>
-<span class="badge">
-⏰ Deadline: <span id="homeDeadline">00:00</span>
-</span>
-</p><div class="grid">
-<button onclick="show('table')">📊 Jadval</button>
-<button onclick="show('rounds')">📅 Turlar</button>
-<button onclick="show('teams')">👥 Jamoalar</button>
+
+.my-match{
+border:1px solid #5865f2
+}
+
+.admin-list{
+max-height:400px;
+overflow:auto
+}
+
+.admin-player{
+display:flex;
+justify-content:space-between;
+gap:10px;
+align-items:center;
+padding:9px 0;
+border-bottom:
+1px solid #293354
+}
+
+@media(max-width:500px){
+
+.fixture{
+grid-template-columns:
+1fr 50px 1fr
+}
+
+.logo{
+width:35px;
+height:35px
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>
+⚽ eFootball Premier League
+</h1>
+
+<div
+class="sub"
+id="userLine"
+>
+Telegram...
 </div>
-</div><div class="card">
+
+</header>
+
+
+<nav>
+
+<button
+class="tab active"
+data-tab="home"
+>
+Bosh sahifa
+</button>
+
+<button
+class="tab"
+data-tab="table"
+>
+Jadval
+</button>
+
+<button
+class="tab"
+data-tab="rounds"
+>
+Turlar
+</button>
+
+<button
+class="tab"
+data-tab="teams"
+>
+Jamoalar
+</button>
+
+<button
+class="tab admin-only"
+data-tab="admin"
+>
+⚙️ Admin
+</button>
+
+</nav>
+
+
+<main>
+
+
+<section
+id="home"
+class="active"
+>
+
+<div class="hero">
+
+<h2>
+2026/27 mavsum
+</h2>
+
+<p class="small">
+20 jamoa · 38 tur · 380 ta o‘yin
+</p>
+
+<p>
+<span class="badge">
+⏰ Deadline:
+<span
+id="homeDeadline"
+class="deadline"
+>
+00:00
+</span>
+</span>
+</p>
+
+<div class="grid">
+
+<button
+onclick="show('table')"
+>
+📊 Jadval
+</button>
+
+<button
+onclick="show('rounds')"
+>
+📅 Turlar
+</button>
+
+<button
+onclick="show('teams')"
+>
+👥 Jamoalar
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
 <div class="row">
-<b>So‘nggi natijalar</b>
+
+<b>
+So‘nggi natijalar
+</b>
+
 <span id="played"></span>
-</div><div id="recent"></div>
-</div></section><section id="table"><div class="card"><div class="row">
-<h3>🏆 Turnir jadvali</h3><button
+
+</div>
+
+<div id="recent"></div>
+
+</div>
+
+
+<div
+class="card"
+id="myMatchesCard"
+style="display:none"
+>
+
+<h3>
+🎮 Mening o‘yinlarim
+</h3>
+
+<div
+id="myMatches"
+></div>
+
+</div>
+
+</section>
+
+
+<section id="table">
+
+<div class="card">
+
+<div class="row">
+
+<h3>
+🏆 Turnir jadvali
+</h3>
+
+<button
 class="danger admin-only"
-onclick="clearResults()">
+onclick="clearResults()"
+>
 Tozalash
 </button>
 
-</div><div style="overflow:auto"><table><thead>
+</div>
+
+<div style="overflow:auto">
+
+<table>
+
+<thead>
+
 <tr>
+
 <th>#</th>
 <th>Jamoa</th>
 <th>O</th>
@@ -266,41 +488,150 @@ Tozalash
 <th>GA</th>
 <th>GD</th>
 <th>Ochko</th>
+
 </tr>
-</thead><tbody id="standings"></tbody></table></div></div></section><section id="rounds"><div class="card"><div class="row"><b>Tur</b>
+
+</thead>
+
+<tbody id="standings"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="rounds">
+
+<div class="card">
+
+<div class="row">
+
+<b>
+Tur
+</b>
 
 <select id="round"></select>
 
-</div><div id="matches"></div></div></section><section id="teams"><div class="card"><h3>👥 Jamoalar</h3><div id="teamlist" class="grid"></div></div></section><section id="admin"><div class="card"><h3>👤 Ishtirokchi biriktirish</h3><div class="small">
-Telegram username orqali biriktiriladi. Masalan: @javohir_n06
-</div><br><div class="grid"><input
+</div>
+
+<div id="matches"></div>
+
+</div>
+
+</section>
+
+
+<section id="teams">
+
+<div class="card">
+
+<h3>
+👥 Jamoalar
+</h3>
+
+<div
+id="teamlist"
+class="grid"
+></div>
+
+</div>
+
+</section>
+
+
+<section id="admin">
+
+
+<div class="card">
+
+<h3>
+👤 Ishtirokchi biriktirish
+</h3>
+
+<p class="small">
+Telegram ID kerak emas.
+Faqat @username yoziladi.
+</p>
+
+<div class="grid">
+
+<input
 id="pname"
-placeholder="Ishtirokchi nomi">
+placeholder="Ishtirokchi nomi"
+>
 
 <input
 id="pusername"
-placeholder="@username">
+placeholder="@username"
+>
 
 <select id="pteam"></select>
 
-</div><br><button
+</div>
+
+<br>
+
+<button
 class="good"
-onclick="assign()">
-Saqlash
+onclick="assign()"
+>
+💾 Saqlash
 </button>
 
-<div id="plist"></div></div><div class="card"><h3>⏰ Deadline</h3><div class="grid"><input
+<div
+id="plist"
+class="admin-list"
+></div>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+⏰ Deadline
+</h3>
+
+<div class="grid">
+
+<input
 id="deadline"
 type="time"
-value="00:00">
+value="00:00"
+>
 
-</div><br><button
+</div>
+
+<br>
+
+<button
 class="good"
-onclick="saveDeadline()">
-Deadline'ni saqlash
+onclick="saveDeadline()"
+>
+💾 Deadline saqlash
 </button>
 
-</div><div class="card"><h3>⚽ Natija kiritish</h3><div class="grid"><select id="rr"></select>
+</div>
+
+
+<div class="card">
+
+<h3>
+⚽ Natija kiritish
+</h3>
+
+<p class="small">
+Admin istalgan o‘yinning natijasini
+kiritishi yoki o‘zgartirishi mumkin.
+</p>
+
+<div class="grid">
+
+<select id="rr"></select>
 
 <select id="rh"></select>
 
@@ -308,7 +639,8 @@ Deadline'ni saqlash
 id="hs"
 type="number"
 min="0"
-placeholder="Uy gol">
+placeholder="Uy gol"
+>
 
 <select id="ra"></select>
 
@@ -316,15 +648,33 @@ placeholder="Uy gol">
 id="as"
 type="number"
 min="0"
-placeholder="Mehmon gol">
+placeholder="Mehmon gol"
+>
 
-</div><br><button
+</div>
+
+<br>
+
+<button
 class="good"
-onclick="result()">
-Natijani saqlash
+onclick="result()"
+>
+💾 Natijani saqlash
 </button>
 
-</div></section></main><script>
+</div>
+
+</section>
+
+</main>
+
+
+<script>
+
+
+/* =========================
+   JAMOALAR
+========================= */
 
 const TEAMS = [
 
@@ -352,48 +702,84 @@ const TEAMS = [
 ];
 
 
-/*
-Jamoalarning ko‘rinadigan emblemalari.
-Agar keyinchalik haqiqiy PNG emblema URLlarini qo‘ysak,
-shu joydan almashtiramiz.
-*/
+/* =========================
+   EMBLEMALAR
+========================= */
 
 const TEAM_LOGOS = {
 
-"AFC Bournemouth":"🔴",
-"Arsenal":"🔴",
-"Aston Villa":"🟣",
-"Brentford":"🔴",
-"Brighton & Hove Albion":"🔵",
-"Chelsea":"🔵",
-"Coventry City":"🔵",
-"Crystal Palace":"🔴",
-"Everton":"🔵",
-"Fulham":"⚫",
-"Hull City":"🟠",
-"Ipswich Town":"🔵",
-"Leeds United":"⚪",
-"Liverpool":"🔴",
-"Manchester City":"🔵",
-"Manchester United":"🔴",
-"Newcastle United":"⚫",
-"Nottingham Forest":"🔴",
-"Sunderland":"🔴",
-"Tottenham Hotspur":"⚪"
+"AFC Bournemouth":
+"https://resources.premierleague.com/premierleague/badges/70/t127.png",
+
+"Arsenal":
+"https://resources.premierleague.com/premierleague/badges/70/t3.png",
+
+"Aston Villa":
+"https://resources.premierleague.com/premierleague/badges/70/t7.png",
+
+"Brentford":
+"https://resources.premierleague.com/premierleague/badges/70/t94.png",
+
+"Brighton & Hove Albion":
+"https://resources.premierleague.com/premierleague/badges/70/t36.png",
+
+"Chelsea":
+"https://resources.premierleague.com/premierleague/badges/70/t8.png",
+
+"Coventry City":
+"https://resources.premierleague.com/premierleague/badges/70/t195.png",
+
+"Crystal Palace":
+"https://resources.premierleague.com/premierleague/badges/70/t31.png",
+
+"Everton":
+"https://resources.premierleague.com/premierleague/badges/70/t11.png",
+
+"Fulham":
+"https://resources.premierleague.com/premierleague/badges/70/t54.png",
+
+"Hull City":
+"https://resources.premierleague.com/premierleague/badges/70/t308.png",
+
+"Ipswich Town":
+"https://resources.premierleague.com/premierleague/badges/70/t40.png",
+
+"Leeds United":
+"https://resources.premierleague.com/premierleague/badges/70/t2.png",
+
+"Liverpool":
+"https://resources.premierleague.com/premierleague/badges/70/t14.png",
+
+"Manchester City":
+"https://resources.premierleague.com/premierleague/badges/70/t43.png",
+
+"Manchester United":
+"https://resources.premierleague.com/premierleague/badges/70/t1.png",
+
+"Newcastle United":
+"https://resources.premierleague.com/premierleague/badges/70/t4.png",
+
+"Nottingham Forest":
+"https://resources.premierleague.com/premierleague/badges/70/t17.png",
+
+"Sunderland":
+"https://resources.premierleague.com/premierleague/badges/70/t56.png",
+
+"Tottenham Hotspur":
+"https://resources.premierleague.com/premierleague/badges/70/t6.png"
 
 };
 
 
-/*
-20 ta jamoa uchun real 38 turli tizim.
-Birinchi 19 turda har bir juftlik bir marta,
-keyingi 19 turda uy/mehmon almashadi.
-*/
+/* =========================
+   38 TUR GENERATOR
+========================= */
 
 function generateFixtures(){
 
 let teams=[...TEAMS];
-let rounds=[];
+
+let first=[];
 
 for(let r=0;r<19;r++){
 
@@ -402,6 +788,7 @@ let games=[];
 for(let i=0;i<10;i++){
 
 let a=teams[i];
+
 let b=teams[19-i];
 
 if(r%2===0){
@@ -416,108 +803,164 @@ games.push([b,a]);
 
 }
 
-rounds.push(games);
+first.push(games);
 
-let fixed=teams[0];
+const fixed=teams[0];
 
-let rest=teams.slice(1);
+const rest=teams.slice(1);
 
 rest.unshift(rest.pop());
 
-teams=[fixed,...rest];
+teams=[
+fixed,
+...rest
+];
 
 }
 
-let second=rounds.map(
-round=>round.map(([h,a])=>[a,h])
+const second=
+first.map(
+round =>
+round.map(
+([h,a]) =>
+[a,h]
+)
 );
 
-return [...rounds,...second];
+return [
+...first,
+...second
+];
 
 }
 
-const FIXTURES=generateFixtures();
+
+const FIXTURES=
+generateFixtures();
 
 
-const TG=window.Telegram?.WebApp;
+/* =========================
+   TELEGRAM
+========================= */
+
+const TG=
+window.Telegram?.WebApp;
 
 TG?.ready();
 TG?.expand();
 
 
-const U=TG?.initDataUnsafe?.user;
+const U=
+TG?.initDataUnsafe?.user;
 
-const MY_USERNAME=String(
+
+const MY_USERNAME=
+String(
 U?.username || ''
 )
+.trim()
 .toLowerCase()
-.replace(/^@/,'')
-.trim();
+.replace(/^@/,'');
 
 
 const ADMIN_IDS=[
-'1956013467'
+"1956013467"
 ];
 
 
 const ADMIN=
-U &&
-ADMIN_IDS.includes(String(U.id));
+!!U &&
+ADMIN_IDS.includes(
+String(U.id)
+);
 
 
 if(U){
 
-document.getElementById('userLine').textContent=
-'👤 @'+(U.username || U.first_name || 'Foydalanuvchi')+
-(ADMIN?' · ADMIN':'');
+document.getElementById(
+"userLine"
+).textContent=
+"👤 @"+
+(
+U.username ||
+U.first_name ||
+"Foydalanuvchi"
+)+
+(
+ADMIN
+?
+" · ADMIN"
+:
+""
+);
+
 }
 
 
 if(ADMIN){
 
 document
-.querySelectorAll('.admin-only')
-.forEach(x=>x.style.display='block');
+.querySelectorAll(".admin-only")
+.forEach(
+x =>
+x.style.display=
+"block"
+);
 
 }
 
+
+/* =========================
+   STATE
+========================= */
 
 let d={
 players:{},
 results:{},
 chats:{},
-deadline:'00:00'
+deadline:"00:00"
 };
 
 
-const tgInit=TG?.initData || '';
+const tgInit=
+TG?.initData || "";
 
+
+/* =========================
+   STATE YUKLASH
+========================= */
 
 async function loadState(){
 
 try{
 
-const r=await fetch(
-'/api/state',
-{cache:'no-store'}
+const response=
+await fetch(
+"/api/state",
+{
+cache:"no-store"
+}
 );
 
-if(r.ok){
+if(response.ok){
 
-d=await r.json();
+const data=
+await response.json();
 
-d.players=d.players||{};
-d.results=d.results||{};
-d.chats=d.chats||{};
-d.deadline=d.deadline||'00:00';
+d={
+players:data.players || {},
+results:data.results || {},
+chats:data.chats || {},
+deadline:data.deadline || "00:00"
+};
 
 }
 
 render();
 
-}catch(e){
+}catch(error){
 
-console.error(e);
+console.error(error);
 
 render();
 
@@ -525,39 +968,45 @@ render();
 
 }
 
+
+/* =========================
+   SAQLASH
+========================= */
 
 async function save(){
 
-if(!ADMIN){
-
-return false;
-
-}
-
-const r=await fetch(
-'/api/state',
+const response=
+await fetch(
+"/api/state",
 {
-method:'PUT',
+method:"PUT",
 
 headers:{
-'Content-Type':'application/json',
-'X-Telegram-Init-Data':tgInit
+"Content-Type":
+"application/json",
+
+"X-Telegram-Init-Data":
+tgInit
 },
 
-body:JSON.stringify(d)
+body:
+JSON.stringify(d)
 
 }
 );
 
-if(!r.ok){
+if(!response.ok){
 
-const x=await r
+const error=
+await response
 .json()
-.catch(()=>({}));
+.catch(
+()=>({})
+);
 
 alert(
-x.error ||
-'Saqlashda xato'
+error.error ||
+"Saqlashda xato"
 );
 
 return false;
@@ -569,58 +1018,34 @@ return true;
 }
 
 
-async function participantSave(){
-
-const r=await fetch(
-'/api/state',
-{
-method:'PUT',
-
-headers:{
-'Content-Type':'application/json',
-'X-Telegram-Init-Data':tgInit
-},
-
-body:JSON.stringify(d)
-
-}
-);
-
-if(!r.ok){
-
-const x=await r
-.json()
-.catch(()=>({}));
-
-alert(
-x.error ||
-'Saqlashda xato'
-);
-
-return false;
-
-}
-
-return true;
-
-}
-
+/* =========================
+   TAB
+========================= */
 
 function show(id){
 
 document
-.querySelectorAll('section')
-.forEach(x=>x.classList.remove('active'));
+.querySelectorAll("section")
+.forEach(
+x =>
+x.classList.remove("active")
+);
+
+const section=
+document.getElementById(id);
+
+if(section){
+
+section.classList.add("active");
+
+}
 
 document
-.getElementById(id)
-.classList.add('active');
-
-document
-.querySelectorAll('.tab')
-.forEach(x=>
+.querySelectorAll(".tab")
+.forEach(
+x =>
 x.classList.toggle(
-'active',
+"active",
 x.dataset.tab===id
 )
 );
@@ -629,52 +1054,70 @@ x.dataset.tab===id
 
 
 document
-.querySelectorAll('.tab')
+.querySelectorAll(".tab")
 .forEach(
-x=>x.onclick=()=>show(x.dataset.tab)
+button =>
+button.onclick=
+() =>
+show(button.dataset.tab)
 );
 
 
-function opts(id,arr=TEAMS){
+/* =========================
+   SELECT
+========================= */
 
-let e=document.getElementById(id);
+function opts(
+id,
+arr=TEAMS
+){
 
-e.innerHTML='';
+const element=
+document.getElementById(id);
 
-arr.forEach(x=>
-e.add(
-new Option(x,x)
+element.innerHTML="";
+
+arr.forEach(
+team =>
+element.add(
+new Option(team,team)
 )
 );
 
 }
 
 
+/* =========================
+   INIT
+========================= */
+
 function init(){
 
-opts('pteam');
+opts("pteam");
 
 for(let i=0;i<38;i++){
 
 round.add(
 new Option(
-(i+1)+'-tur',
+(i+1)+"-tur",
 i
 )
 );
 
 rr.add(
 new Option(
-(i+1)+'-tur',
+(i+1)+"-tur",
 i
 )
 );
 
 }
 
-round.onchange=renderRound;
+round.onchange=
+renderRound;
 
-rr.onchange=fillResult;
+rr.onchange=
+fillResult;
 
 fillResult();
 
@@ -683,48 +1126,76 @@ render();
 }
 
 
+/* =========================
+   NATIJA SELECT
+========================= */
+
 function fillResult(){
 
-let r=+rr.value;
+const r=
+Number(rr.value || 0);
 
-let hs=
-FIXTURES[r]
-.map(x=>x[0]);
+const fixtures=
+FIXTURES[r] || [];
 
-let as=
-FIXTURES[r]
-.map(x=>x[1]);
+const homes=
+fixtures.map(
+x=>x[0]
+);
 
-opts('rh',hs);
-opts('ra',as);
+const aways=
+fixtures.map(
+x=>x[1]
+);
+
+opts("rh",homes);
+opts("ra",aways);
 
 }
 
 
-function normalizeUsername(x){
+/* =========================
+   USERNAME
+========================= */
 
-return String(x||'')
-.toLowerCase()
+function normalizeUsername(value){
+
+return String(value || "")
 .trim()
-.replace(/^@/,'');
+.toLowerCase()
+.replace(/^@/,"");
 
 }
 
+
+/* =========================
+   JAMOA EGASI
+========================= */
 
 function isMyPlayer(team){
 
-let p=d.players?.[team];
+const player=
+d.players?.[team];
 
-if(!p) return false;
+if(!player) return false;
 
-return normalizeUsername(p.username)===MY_USERNAME;
+return (
+normalizeUsername(
+player.username
+) ===
+MY_USERNAME
+);
 
 }
 
 
+/* =========================
+   MENING O‘YINLARIM
+========================= */
+
 function getMyMatches(){
 
-let arr=[];
+const games=[];
 
 for(let r=0;r<38;r++){
 
@@ -736,7 +1207,7 @@ isMyPlayer(h) ||
 isMyPlayer(a)
 ){
 
-arr.push({
+games.push({
 r,
 h,
 a
@@ -749,86 +1220,179 @@ a
 
 }
 
-return arr;
+return games;
 
 }
 
+
+/* =========================
+   ADMIN:
+   ISHTIROKCHI BIRIKTIRISH
+========================= */
 
 async function assign(){
 
 if(!ADMIN){
 
-return alert(
-'Admin huquqi kerak'
+alert(
+"Admin huquqi kerak"
 );
+
+return;
 
 }
 
-let n=
+const name=
 pname.value.trim();
 
-let u=
+const username=
 normalizeUsername(
 pusername.value
 );
 
-let t=
+const team=
 pteam.value;
 
-if(!n){
+if(!name){
 
-return alert(
-'Ishtirokchi nomini kiriting'
+alert(
+"Ishtirokchi nomini kiriting"
 );
+
+return;
 
 }
 
-if(!u){
+if(!username){
 
-return alert(
-'Username kiriting'
+alert(
+"@username kiriting"
 );
+
+return;
 
 }
 
-if(!t){
+if(!team){
 
-return alert(
-'Jamoani tanlang'
+alert(
+"Jamoani tanlang"
 );
+
+return;
 
 }
 
-d.players[t]={
-name:n,
-username:u
+
+/* Username boshqa jamoada bormi? */
+
+for(
+const [oldTeam,player]
+of Object.entries(d.players)
+){
+
+if(
+oldTeam!==team &&
+normalizeUsername(
+player.username
+)===username
+){
+
+alert(
+"Bu username boshqa jamoaga biriktirilgan."
+);
+
+return;
+
+}
+
+}
+
+
+d.players[team]={
+name,
+username
 };
+
 
 if(await save()){
 
 render();
 
-pname.value='';
-pusername.value='';
+pname.value="";
+pusername.value="";
+
+alert(
+"Ishtirokchi biriktirildi."
+);
 
 }
 
 }
 
+
+/* =========================
+   ADMIN:
+   ISHTIROKCHINI O‘CHIRISH
+========================= */
+
+async function removePlayer(team){
+
+if(!ADMIN){
+
+return;
+
+}
+
+const player=
+d.players[team];
+
+if(!player) return;
+
+if(
+!confirm(
+"@"+
+player.username+
+"ni "+
+team+
+"dan o‘chirasizmi?"
+)
+){
+
+return;
+
+}
+
+delete d.players[team];
+
+if(await save()){
+
+render();
+
+}
+
+}
+
+
+/* =========================
+   DEADLINE
+========================= */
 
 async function saveDeadline(){
 
 if(!ADMIN){
 
-return alert(
-'Admin huquqi kerak'
+alert(
+"Admin huquqi kerak"
 );
+
+return;
 
 }
 
-let value=
+const value=
 deadline.value ||
-'00:00';
+"00:00";
 
 d.deadline=value;
 
@@ -837,7 +1401,8 @@ if(await save()){
 render();
 
 alert(
-'Deadline saqlandi'
+"Deadline saqlandi: "+
+value
 );
 
 }
@@ -845,14 +1410,29 @@ alert(
 }
 
 
+/* =========================
+   NATIJA
+========================= */
+
 async function result(){
 
-let r=+rr.value;
-let h=rh.value;
-let a=ra.value;
+const r=
+Number(rr.value);
 
-let x=+hs.value;
-let y=+as.value;
+const h=
+rh.value;
+
+const a=
+ra.value;
+
+const x=
+Number(hs.value);
+
+const y=
+Number(as.value);
+
+
+/* Ishtirokchi faqat o‘z o‘yiniga */
 
 if(
 !ADMIN &&
@@ -860,9 +1440,11 @@ if(
 !isMyPlayer(a)
 ){
 
-return alert(
-'Bu sizning o‘yiningiz emas'
+alert(
+"Bu sizning o‘yiningiz emas."
 );
+
+return;
 
 }
 
@@ -875,15 +1457,21 @@ x<0 ||
 y<0
 ){
 
-return alert(
-'Natijani to‘g‘ri kiriting'
+alert(
+"Natijani to‘g‘ri kiriting."
 );
+
+return;
 
 }
 
 
-let key=
-r+'|'+h+'|'+a;
+const key=
+r+
+"|"+
+h+
+"|"+
+a;
 
 
 d.results[key]={
@@ -893,25 +1481,22 @@ a,
 x,
 y,
 updatedBy:
-MY_USERNAME || 'admin',
+MY_USERNAME ||
+"admin",
 updatedAt:
 new Date().toISOString()
 };
 
 
-if(
-ADMIN
-? await save()
-: await participantSave()
-){
+if(await save()){
 
 render();
 
-hs.value='';
-as.value='';
+hs.value="";
+as.value="";
 
 alert(
-'Natija saqlandi'
+"Natija saqlandi."
 );
 
 }
@@ -919,13 +1504,18 @@ alert(
 }
 
 
+/* =========================
+   TURNIR JADVALI
+========================= */
+
 function calc(){
 
-let s={};
+const table={};
 
-TEAMS.forEach(t=>
-s[t]={
-t,
+TEAMS.forEach(
+team =>
+table[team]={
+t:team,
 p:0,
 w:0,
 d:0,
@@ -938,54 +1528,69 @@ pts:0
 
 
 Object.values(d.results)
-.forEach(x=>{
+.forEach(
+match=>{
 
-let h=s[x.h];
-let a=s[x.a];
+const home=
+table[match.h];
 
-if(!h||!a) return;
+const away=
+table[match.a];
 
-h.p++;
-a.p++;
+if(!home||!away){
 
-h.gf+=Number(x.x);
-h.ga+=Number(x.y);
-
-a.gf+=Number(x.y);
-a.ga+=Number(x.x);
-
-
-if(x.x>x.y){
-
-h.w++;
-a.l++;
-h.pts+=3;
-
-}else if(x.x<x.y){
-
-a.w++;
-h.l++;
-a.pts+=3;
-
-}else{
-
-h.d++;
-a.d++;
-
-h.pts++;
-a.pts++;
+return;
 
 }
 
-});
+const x=
+Number(match.x);
+
+const y=
+Number(match.y);
+
+home.p++;
+away.p++;
+
+home.gf+=x;
+home.ga+=y;
+
+away.gf+=y;
+away.ga+=x;
+
+if(x>y){
+
+home.w++;
+away.l++;
+home.pts+=3;
+
+}else if(x<y){
+
+away.w++;
+home.l++;
+away.pts+=3;
+
+}else{
+
+home.d++;
+away.d++;
+
+home.pts++;
+away.pts++;
+
+}
+
+}
+);
 
 
-return Object
-.values(s)
-.map(x=>({
+return Object.values(table)
+.map(
+x=>({
 ...x,
 gd:x.gf-x.ga
-}))
+})
+)
 .sort(
 (a,b)=>
 b.pts-a.pts ||
@@ -996,23 +1601,55 @@ b.gf-a.gf
 }
 
 
+/* =========================
+   TABLE RENDER
+========================= */
+
 function renderTable(){
 
 standings.innerHTML=
 calc()
-.map((x,i)=>`
+.map(
+(x,i)=>`
 
 <tr>
 
 <td>${i+1}</td>
 
 <td>
+
 <div class="team">
-<span style="font-size:25px">
-${TEAM_LOGOS[x.t]||'⚽'}
-</span>
+
+<img
+class="logo"
+src="${TEAM_LOGOS[x.t]}"
+onerror="this.style.display='none'"
+>
+
+<div>
+
 <b>${x.t}</b>
+
+${
+d.players[x.t]
+
+?
+
+`<div class="small">
+👤 @${normalizeUsername(
+d.players[x.t].username
+)}</div>`
+
+:
+
+""
+
+}
+
 </div>
+
+</div>
+
 </td>
 
 <td>${x.p}</td>
@@ -1026,218 +1663,186 @@ ${TEAM_LOGOS[x.t]||'⚽'}
 
 </tr>
 
-`)
-.join('');
+`
+)
+.join("");
 
 }
 
 
-function renderRound(){
+/* =========================
+   CHAT HTML
+========================= */
 
-let r=
-Number(round.value||0);
+function escapeHtml(text){
 
-let games=
-FIXTURES[r]||[];
-
-matches.innerHTML=
-'<h3>'+
-(r+1)+
-'-tur</h3>'+
-games
-.map(([h,a])=>{
-
-let key=
-r+'|'+h+'|'+a;
-
-let x=
-d.results[key];
-
-let homeLogo=
-TEAM_LOGOS[h]||'⚽';
-
-let awayLogo=
-TEAM_LOGOS[a]||'⚽';
-
-return `
-
-<div class="match-card">
-
-<div class="fixture">
-
-<div>
-<span style="font-size:25px">
-${homeLogo}
-</span>
-<br>
-<b>${h}</b>
-</div>
-
-<div class="score">
-${x?
-x.x+':'+x.y:
-'—'}
-</div>
-
-<div class="away">
-
-<span style="font-size:25px">
-${awayLogo}
-</span>
-
-<br>
-
-<b>${a}</b>
-
-</div>
-
-</div>
-
-${renderMatchActions(r,h,a)}
-
-</div>
-
-`;
-
-})
-.join('');
+return String(text || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
 }
 
 
-function renderMatchActions(r,h,a){
+function escapeJs(text){
 
-let key=
-r+'|'+h+'|'+a;
-
-let x=
-d.results[key];
-
-let canPlay=
-ADMIN ||
-isMyPlayer(h) ||
-isMyPlayer(a);
-
-
-if(!canPlay){
-
-return '';
+return String(text)
+.replace(/\\/g,"\\\\")
+.replace(/'/g,"\\'");
 
 }
 
 
-let chat=
-d.chats?.[key]||[];
+/* =========================
+   CHAT
+========================= */
+
+function chatHTML(
+key,
+home,
+away
+){
+
+const messages=
+d.chats?.[key] || [];
 
 return `
 
 <div class="chat">
 
-<b>💬 Raqib bilan suhbat</b>
+<b>
+💬 Raqib bilan suhbat
+</b>
 
 <div class="chat-messages">
 
 ${
-chat.length
+messages.length
 
 ?
 
-chat.map(m=>`
+messages
+.map(
+message=>`
 
 <div class="message">
 
-<b>@${m.username}</b>
+<b>
+@${escapeHtml(
+message.username
+)}
+</b>
 
-<div>${escapeHtml(m.text)}</div>
+<div class="message-text">
+${escapeHtml(
+message.text
+)}
+</div>
 
 </div>
 
-`).join('')
+`
+)
+.join("")
 
 :
 
-'<div class="empty">Hali xabar yo‘q</div>'
+`<div class="empty">
+Hali xabar yo‘q.
+</div>`
+
 }
 
 </div>
 
 <textarea
 id="chat-${encodeURIComponent(key)}"
-placeholder="Xabar yozing..."
-></textarea><br><br>
+placeholder="Raqibingizga xabar yozing..."
+></textarea>
+
+<br><br>
 
 <button
 class="good"
-onclick="sendChat('${escapeJs(key)}')">
-Yuborish
+onclick="sendChat('${escapeJs(key)}')"
+>
+💬 Yuborish
 </button>
 
-</div>`;
+</div>
+
+`;
 
 }
 
-function escapeHtml(text){
 
-return String(text||'')
-.replace(/&/g,'&')
-.replace(/</g,'<')
-.replace(/>/g,'>')
-.replace(/"/g,'"')
-.replace(/'/g,''');
-
-}
-
-function escapeJs(text){
-
-return String(text)
-.replace(/\/g,'\\')
-.replace(/'/g,"\'");
-
-}
+/* =========================
+   CHAT YUBORISH
+========================= */
 
 async function sendChat(key){
 
-let el=
+const textarea=
 document.getElementById(
-'chat-'+encodeURIComponent(key)
+"chat-"+
+encodeURIComponent(key)
 );
 
-if(!el) return;
+if(!textarea){
 
-let text=
-el.value.trim();
+return;
+
+}
+
+const text=
+textarea.value.trim();
 
 if(!text){
 
-return alert(
-'Xabar yozing'
+alert(
+"Xabar yozing."
 );
+
+return;
 
 }
 
-let parts=
-key.split('|');
 
-let r=
+const parts=
+key.split("|");
+
+if(parts.length<3){
+
+return;
+
+}
+
+const r=
 Number(parts[0]);
 
-let h=
+const home=
 parts[1];
 
-let a=
-parts.slice(2).join('|');
+const away=
+parts.slice(2).join("|");
+
 
 if(
 !ADMIN &&
-!isMyPlayer(h) &&
-!isMyPlayer(a)
+!isMyPlayer(home) &&
+!isMyPlayer(away)
 ){
 
-return alert(
-'Bu chat sizga tegishli emas'
+alert(
+"Bu chat sizga tegishli emas."
 );
 
+return;
+
 }
+
 
 if(!d.chats[key]){
 
@@ -1245,21 +1850,23 @@ d.chats[key]=[];
 
 }
 
+
 d.chats[key].push({
+
 username:
 MY_USERNAME ||
-'admin',
-text,
+"admin",
+
+text:
+text.slice(0,1000),
+
 time:
 new Date().toISOString()
+
 });
 
-let ok=
-ADMIN
-? await save()
-: await participantSave();
 
-if(ok){
+if(await save()){
 
 renderRound();
 
@@ -1267,118 +1874,450 @@ renderRound();
 
 }
 
+
+/* =========================
+   TUR RENDER
+========================= */
+
+function renderRound(){
+
+const r=
+Number(round.value || 0);
+
+const games=
+FIXTURES[r] || [];
+
+matches.innerHTML=
+"<h3>"+
+(r+1)+
+"-tur</h3>"+
+games
+.map(
+([h,a])=>{
+
+const key=
+r+
+"|"+
+h+
+"|"+
+a;
+
+const match=
+d.results[key];
+
+const mine=
+ADMIN ||
+isMyPlayer(h) ||
+isMyPlayer(a);
+
+return `
+
+<div
+class="match-card
+${mine ? "my-match" : ""}"
+>
+
+<div class="fixture">
+
+<div>
+
+<img
+class="logo"
+src="${TEAM_LOGOS[h]}"
+onerror="this.style.display='none'"
+>
+
+<br>
+
+<b>
+${h}
+</b>
+
+${
+d.players[h]
+
+?
+
+`<div class="small">
+@${normalizeUsername(
+d.players[h].username
+)}
+</div>`
+
+:
+
+""
+
+}
+
+</div>
+
+
+<div class="score">
+
+${
+match
+?
+match.x+":"+match.y
+:
+"—"
+}
+
+</div>
+
+
+<div class="away">
+
+<img
+class="logo"
+src="${TEAM_LOGOS[a]}"
+onerror="this.style.display='none'"
+>
+
+<br>
+
+<b>
+${a}
+</b>
+
+${
+d.players[a]
+
+?
+
+`<div class="small">
+@${normalizeUsername(
+d.players[a].username
+)}
+</div>`
+
+:
+
+""
+
+}
+
+</div>
+
+</div>
+
+
+${
+mine
+?
+chatHTML(key,h,a)
+:
+""
+}
+
+</div>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* =========================
+   JAMOALAR
+========================= */
+
 function renderTeams(){
 
 teamlist.innerHTML=
 TEAMS
-.map(t=>{
+.map(
+team=>{
 
-let p=d.players[t];
+const player=
+d.players[team];
 
 return `
 
-<div class="card"><div class="team"><span style="font-size:30px">
-${TEAM_LOGOS[t]||'⚽'}
-</span><div><div class="team-name">
-${t}
-</div><div class="small">${
-p
+<div class="card">
+
+<div class="team">
+
+<img
+class="logo"
+src="${TEAM_LOGOS[team]}"
+onerror="this.style.display='none'"
+>
+
+<div>
+
+<div class="team-name">
+${team}
+</div>
+
+<div class="small">
+
+${
+player
 
 ?
 
-'👤 @'+
-normalizeUsername(p.username)+
-' — '+
-p.name
+"👤 @"+
+normalizeUsername(
+player.username
+)+
+" — "+
+player.name
 
 :
 
-'Bo‘sh'
+"Bo‘sh"
 
 }
 
-</div></div></div></div>`;
+</div>
 
-})
-.join('');
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+)
+.join("");
+
 
 if(ADMIN){
 
 plist.innerHTML=
 TEAMS
-.filter(t=>d.players[t])
-.map(t=>`
+.map(
+team=>{
 
-<p><b>${TEAM_LOGOS[t]||'⚽'} ${t}</b>
+const player=
+d.players[team];
 
-—
+if(!player){
 
+return `
+
+<div class="admin-player">
+
+<div>
+
+<b>
+${team}
+</b>
+
+<div class="small">
+Bo‘sh
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+return `
+
+<div class="admin-player">
+
+<div>
+
+<b>
+${team}
+</b>
+
+<div class="small">
+👤 ${player.name}
+</div>
+
+<div class="small">
 @${normalizeUsername(
-d.players[t].username
+player.username
 )}
+</div>
 
-—
+</div>
 
-${d.players[t].name}
+<button
+class="danger"
+onclick="removePlayer('${escapeJs(team)}')"
+>
+O‘chirish
+</button>
 
-</p>`)
-.join('') ||
+</div>
 
-'<span class="small">
-Hali ishtirokchi yo‘q
-</span>';
+`;
+
+}
+)
+.join("");
 
 }
 
 }
+
+
+/* =========================
+   SO‘NGGI NATIJALAR
+========================= */
 
 function recent(){
 
-let a=
+const list=
 Object.values(d.results)
 .slice(-8)
 .reverse();
 
 played.textContent=
 Object.keys(d.results).length+
-' ta o‘yin';
+" ta o‘yin";
+
+
+if(!list.length){
 
 recent.innerHTML=
-a.length
+`<div class="empty">
+Natija kiritilmagan.
+</div>`;
 
-?
-
-a.map(x=>`
-
-<p>${TEAM_LOGOS[x.h]||'⚽'}
-${x.h}
-
-—
-
-<b>${x.x}:${x.y}</b>
-
-—
-
-${x.a}
-${TEAM_LOGOS[x.a]||'⚽'}
-
-</p>`).join('')
-
-:
-
-'<span class="small">
-Natija kiritilmagan
-</span>';
+return;
 
 }
 
+
+recent.innerHTML=
+list
+.map(
+match=>`
+
+<p>
+
+${match.h}
+
+<b>
+${match.x}:${match.y}
+</b>
+
+${match.a}
+
+</p>
+
+`
+)
+.join("");
+
+}
+
+
+/* =========================
+   MENING O‘YINLARIM
+========================= */
+
+function renderMyMatches(){
+
+const games=
+getMyMatches();
+
+if(!MY_USERNAME || !games.length){
+
+myMatchesCard.style.display=
+"none";
+
+return;
+
+}
+
+myMatchesCard.style.display=
+"block";
+
+
+myMatches.innerHTML=
+games
+.map(
+game=>{
+
+const key=
+game.r+
+"|"+
+game.h+
+"|"+
+game.a;
+
+const match=
+d.results[key];
+
+return `
+
+<div class="match-card">
+
+<div class="row">
+
+<b>
+${game.r+1}-tur
+</b>
+
+<span class="badge">
+
+${
+match
+?
+match.x+":"+match.y
+:
+"Natija yo‘q"
+}
+
+</span>
+
+</div>
+
+<p>
+
+${game.h}
+
+<b>
+${
+match
+?
+match.x+":"+match.y
+:
+"—"
+}
+</b>
+
+${game.a}
+
+</p>
+
+</div>
+
+`;
+
+}
+)
+.join("");
+
+}
+
+
+/* =========================
+   DEADLINE
+========================= */
+
 function renderDeadline(){
 
-let value=
+const value=
 d.deadline ||
-'00:00';
+"00:00";
 
-homeDeadline.textContent=value;
+homeDeadline.textContent=
+value;
 
 if(ADMIN){
 
@@ -1387,6 +2326,11 @@ deadline.value=value;
 }
 
 }
+
+
+/* =========================
+   UMUMIY RENDER
+========================= */
 
 function render(){
 
@@ -1400,23 +2344,37 @@ recent();
 
 renderDeadline();
 
+renderMyMatches();
+
 }
+
+
+/* =========================
+   BARCHA NATIJALARNI
+   TOZALASH
+========================= */
 
 async function clearResults(){
 
 if(!ADMIN){
 
-return alert(
-'Admin huquqi kerak'
+alert(
+"Admin huquqi kerak"
 );
+
+return;
 
 }
 
 if(
-confirm(
-'Barcha natijalar o‘chirilsinmi?'
+!confirm(
+"Barcha natijalar o‘chirilsinmi?"
 )
 ){
+
+return;
+
+}
 
 d.results={};
 
@@ -1424,15 +2382,24 @@ if(await save()){
 
 render();
 
-}
+alert(
+"Barcha natijalar o‘chirildi."
+);
 
 }
 
 }
+
+
+/* =========================
+   ISHGA TUSHIRISH
+========================= */
 
 init();
 
 loadState();
 
-</script></body>
-  </html>
+</script>
+
+</body>
+</html>
