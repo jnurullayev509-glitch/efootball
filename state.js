@@ -3,18 +3,33 @@ import crypto from 'crypto';
 
 const PATH = 'efpl/state.json';
 
+const EMPTY_STATE = {
+  players: {},
+  results: {},
+  chats: {},
+  deadline: '00:00'
+};
+
+function getUsername(user) {
+  return String(user?.username || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, '');
+}
+
 function verifyTelegram(initData) {
   if (!initData || !process.env.BOT_TOKEN) return null;
 
   const params = new URLSearchParams(initData);
   const hash = params.get('hash');
+
   if (!hash) return null;
 
   params.delete('hash');
 
   const dataCheckString = [...params.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([k, v]) => `${k}=${v}`)
+    .map(([key, value]) => `${key}=${value}`)
     .join('\n');
 
   const secret = crypto
@@ -33,9 +48,12 @@ function verifyTelegram(initData) {
       Buffer.from(calculated),
       Buffer.from(hash)
     )
-  ) return null;
+  ) {
+    return null;
+  }
 
   const userRaw = params.get('user');
+
   if (!userRaw) return null;
 
   try {
@@ -43,45 +61,6 @@ function verifyTelegram(initData) {
   } catch {
     return null;
   }
-}
-
-async function readState() {
-  const { blobs } = await list({
-    prefix: PATH,
-    limit: 10,
-    token: process.env.BLOB_READ_WRITE_TOKEN
-  });
-
-  const blob = blobs.find(b => b.pathname === PATH);
-
-  if (!blob) {
-    return {
-      players: {},
-      results: {},
-      chats: {},
-      deadline: '00:00'
-    };
-  }
-
-  const r = await fetch(blob.url, { cache: 'no-store' });
-
-  if (!r.ok) {
-    return {
-      players: {},
-      results: {},
-      chats: {},
-      deadline: '00:00'
-    };
-  }
-
-  return await r.json();
-}
-
-function username(user) {
-  return String(user?.username || '')
-    .trim()
-    .toLowerCase()
-    .replace(/^@/, '');
 }
 
 function isAdmin(user) {
@@ -93,18 +72,166 @@ function isAdmin(user) {
   return admins.includes(String(user?.id));
 }
 
-function isParticipant(user, state) {
-  const u = username(user);
+async function readState() {
+  try {
+    const { blobs } = await list({
+      prefix: PATH,
+      limit: 10,
+      token: process.env.BLOB_READ_WRITE_TOKEN
+    });
 
-  if (!u) return false;
+    const blob = blobs.find(
+      item => item.pathname === PATH
+    );
 
-  return Object.values(state.players || {}).some(
-    p => username({ username: p.username }) === u
+    if (!blob) return { ...EMPTY_STATE };
+
+    const response = await fetch(
+      blob.url,
+      { cache: 'no-store' }
+    );
+
+    if (!response.ok) {
+      return { ...EMPTY_STATE };
+    }
+
+    const data = await response.json();
+
+    return {
+      players: data.players || {},
+      results: data.results || {},
+      chats: data.chats || {},
+      deadline: data.deadline || '00:00'
+    };
+
+  } catch (error) {
+    console.error('READ ERROR:', error);
+    return { ...EMPTY_STATE };
+  }
+}
+
+function cleanUsername(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, '');
+}
+
+function playerOwnsTeam(user, team, state) {
+  const username = getUsername(user);
+
+  if (!username) return false;
+
+  const player = state.players?.[team];
+
+  if (!player) return false;
+
+  return cleanUsername(player.username) === username;
+}
+
+function userOwnsMatch(user, home, away, state) {
+  return (
+    playerOwnsTeam(user, home, state) ||
+    playerOwnsTeam(user, away, state)
   );
 }
 
+function validatePlayers(players) {
+  if (!players || typeof players !== 'object') {
+    return {};
+  }
+
+  const output = {};
+
+  for (const [team, player] of Object.entries(players)) {
+    if (!player || typeof player !== 'object') continue;
+
+    const username = cleanUsername(player.username);
+    const name = String(player.name || '').trim();
+
+    if (!username || !name) continue;
+
+    output[team] = {
+      name,
+      username
+    };
+  }
+
+  return output;
+}
+
+function validateResults(results) {
+  if (!results || typeof results !== 'object') {
+    return {};
+  }
+
+  const output = {};
+
+  for (const [key, value] of Object.entries(results)) {
+    if (!value || typeof value !== 'object') continue;
+
+    const x = Number(value.x);
+    const y = Number(value.y);
+
+    if (
+      !Number.isInteger(x) ||
+      !Number.isInteger(y) ||
+      x < 0 ||
+      y < 0
+    ) {
+      continue;
+    }
+
+    output[key] = {
+      r: Number(value.r),
+      h: String(value.h),
+      a: String(value.a),
+      x,
+      y,
+      updatedBy: String(value.updatedBy || ''),
+      updatedAt: String(
+        value.updatedAt || new Date().toISOString()
+      )
+    };
+  }
+
+  return output;
+}
+
+function validateChats(chats) {
+  if (!chats || typeof chats !== 'object') {
+    return {};
+  }
+
+  const output = {};
+
+  for (const [key, messages] of Object.entries(chats)) {
+    if (!Array.isArray(messages)) continue;
+
+    output[key] = messages
+      .filter(
+        message =>
+          message &&
+          typeof message === 'object' &&
+          String(message.text || '').trim()
+      )
+      .slice(-100)
+      .map(message => ({
+        username: cleanUsername(message.username),
+        text: String(message.text).trim().slice(0, 1000),
+        time: String(
+          message.time || new Date().toISOString()
+        )
+      }));
+  }
+
+  return output;
+}
+
 export default async function handler(req, res) {
+
   try {
+
     if (req.method === 'GET') {
       const state = await readState();
       return res.status(200).json(state);
@@ -126,36 +253,129 @@ export default async function handler(req, res) {
       });
     }
 
-    const state =
+    const current = await readState();
+
+    const incoming =
       typeof req.body === 'string'
         ? JSON.parse(req.body)
         : req.body;
 
-    if (!state || typeof state !== 'object') {
+    if (!incoming || typeof incoming !== 'object') {
       return res.status(400).json({
         error: 'Invalid state'
       });
     }
 
     const admin = isAdmin(user);
-    const participant = isParticipant(user, state);
 
-    if (!admin && !participant) {
-      return res.status(403).json({
-        error: 'Siz ro‘yxatdan o‘tgan ishtirokchi emassiz'
-      });
-    }
+    const newState = {
+      players: current.players || {},
+      results: current.results || {},
+      chats: current.chats || {},
+      deadline: current.deadline || '00:00'
+    };
 
-    const current = await readState();
+    /*
+     * ADMIN
+     * Hammasini boshqarishi mumkin.
+     */
 
-    if (!admin) {
-      state.players = current.players || {};
-      state.deadline = current.deadline || '00:00';
+    if (admin) {
+
+      newState.players =
+        validatePlayers(incoming.players);
+
+      newState.results =
+        validateResults(incoming.results);
+
+      newState.chats =
+        validateChats(incoming.chats);
+
+      newState.deadline =
+        String(incoming.deadline || '00:00');
+
+    } else {
+
+      /*
+       * ISHTIROKCHI
+       *
+       * Jamoalarni o‘zgartira olmaydi.
+       * Deadline'ni o‘zgartira olmaydi.
+       * Faqat o‘z o‘yini natijasi va
+       * o‘z o‘yinidagi chatni o‘zgartira oladi.
+       */
+
+      const username = getUsername(user);
+
+      if (!username) {
+        return res.status(403).json({
+          error:
+            'Telegram username mavjud emas. Telegram profilingizga username qo‘ying.'
+        });
+      }
+
+      const participantTeams =
+        Object.entries(current.players || {})
+          .filter(
+            ([, player]) =>
+              cleanUsername(player.username) === username
+          )
+          .map(([team]) => team);
+
+      if (participantTeams.length === 0) {
+        return res.status(403).json({
+          error:
+            'Siz hali hech qaysi jamoaga biriktirilmagansiz.'
+        });
+      }
+
+      const incomingResults =
+        validateResults(incoming.results);
+
+      for (const [key, value] of Object.entries(
+        incomingResults
+      )) {
+
+        const owns =
+          participantTeams.includes(value.h) ||
+          participantTeams.includes(value.a);
+
+        if (!owns) continue;
+
+        newState.results[key] = value;
+      }
+
+      /*
+       * Chatlar
+       */
+
+      const incomingChats =
+        validateChats(incoming.chats);
+
+      for (const [key, messages] of Object.entries(
+        incomingChats
+      )) {
+
+        const parts = key.split('|');
+
+        if (parts.length < 3) continue;
+
+        const home = parts[1];
+        const away = parts.slice(2).join('|');
+
+        const owns =
+          participantTeams.includes(home) ||
+          participantTeams.includes(away);
+
+        if (!owns) continue;
+
+        newState.chats[key] = messages;
+      }
     }
 
     const blob = await put(
       PATH,
-      JSON.stringify(state),
+      JSON.stringify(newState),
       {
         access: 'public',
         addRandomSuffix: false,
@@ -170,8 +390,9 @@ export default async function handler(req, res) {
       url: blob.url
     });
 
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+
+    console.error('STATE ERROR:', error);
 
     return res.status(500).json({
       error: 'Server error'
