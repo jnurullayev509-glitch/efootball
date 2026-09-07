@@ -1,7 +1,28 @@
 import { put, list } from '@vercel/blob';
 import crypto from 'crypto';
 
-const PATH = 'efpl/state.json';
+const PATH = 'efpl/state.json'; const TEAMS = [
+  "AFC Bournemouth",
+  "Arsenal",
+  "Aston Villa",
+  "Brentford",
+  "Brighton & Hove Albion",
+  "Chelsea",
+  "Coventry City",
+  "Crystal Palace",
+  "Everton",
+  "Fulham",
+  "Hull City",
+  "Ipswich Town",
+  "Leeds United",
+  "Liverpool",
+  "Manchester City",
+  "Manchester United",
+  "Newcastle United",
+  "Nottingham Forest",
+  "Sunderland",
+  "Tottenham Hotspur"
+];
 
 const EMPTY_STATE = {
   players: {},
@@ -266,7 +287,111 @@ export default async function handler(req, res) {
       });
     }
 
-    const admin = isAdmin(user);
+    const admin = isAdmin(user); /*
+ * ISHTIROKCHINI O'ZI RO'YXATDAN O'TKAZISH
+ *
+ * Faqat Telegram username orqali aniqlanadi.
+ * Ishtirokchi jamoani o'zi tanlaydi.
+ */
+
+if (incoming.action === 'register') {
+
+  const username = getUsername(user);
+
+  if (!username) {
+    return res.status(403).json({
+      error:
+        'Telegram username mavjud emas. Avval Telegram profilingizga username qo‘ying.'
+    });
+  }
+
+  const name = String(incoming.name || '').trim();
+  const team = String(incoming.team || '').trim();
+
+  if (!name) {
+    return res.status(400).json({
+      error: 'Ismingizni kiriting.'
+    });
+  }
+
+  if (name.length > 50) {
+    return res.status(400).json({
+      error: 'Ism 50 belgidan oshmasligi kerak.'
+    });
+  }
+
+  if (!TEAMS.includes(team)) {
+    return res.status(400).json({
+      error: 'Noto‘g‘ri jamoa tanlandi.'
+    });
+  }
+
+  /*
+   * Bu username oldin ro'yxatdan o'tganmi?
+   */
+
+  const alreadyRegistered = Object.entries(
+    current.players || {}
+  ).find(
+    ([, player]) =>
+      cleanUsername(player?.username) === username
+  );
+
+  if (alreadyRegistered) {
+    return res.status(409).json({
+      error:
+        `Siz allaqachon ${alreadyRegistered[0]} jamoasiga ro‘yxatdan o‘tgansiz.`
+    });
+  }
+
+  /*
+   * Bu jamoani boshqa odam egallaganmi?
+   */
+
+  if (current.players?.[team]) {
+    return res.status(409).json({
+      error:
+        `${team} jamoasi allaqachon tanlangan. Boshqa jamoani tanlang.`
+    });
+  }
+
+  /*
+   * Yangi ishtirokchini qo'shamiz.
+   */
+
+  const newState = {
+    players: {
+      ...(current.players || {}),
+      [team]: {
+        name,
+        username
+      }
+    },
+    results: current.results || {},
+    chats: current.chats || {},
+    deadline: current.deadline || '00:00'
+  };
+
+  const blob = await put(
+    PATH,
+    JSON.stringify(newState),
+    {
+      access: 'public',
+      addRandomSuffix: false,
+      contentType: 'application/json',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      allowOverwrite: true
+    }
+  );
+
+  return res.status(200).json({
+    ok: true,
+    message: 'Ro‘yxatdan o‘tish muvaffaqiyatli.',
+    team,
+    username,
+    url: blob.url
+  });
+}
 
     const newState = {
       players: current.players || {},
