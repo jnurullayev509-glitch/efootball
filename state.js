@@ -28,8 +28,9 @@ function verifyTelegram(initData) {
     .update(dataCheckString)
     .digest('hex');
 
+  if (calculated.length !== hash.length) return null;
+
   if (
-    calculated.length !== hash.length ||
     !crypto.timingSafeEqual(
       Buffer.from(calculated),
       Buffer.from(hash)
@@ -60,9 +61,9 @@ async function readState() {
 
   if (!blob) {
     return {
+      users: {},
       players: {},
-      results: {},
-      users: {}
+      results: {}
     };
   }
 
@@ -72,22 +73,22 @@ async function readState() {
 
   if (!r.ok) {
     return {
+      users: {},
       players: {},
-      results: {},
-      users: {}
+      results: {}
     };
   }
 
   const state = await r.json();
 
+  if (!state.users) state.users = {};
   if (!state.players) state.players = {};
   if (!state.results) state.results = {};
-  if (!state.users) state.users = {};
 
   return state;
 }
 
-async function saveState(state) {
+async function writeState(state) {
   return await put(
     PATH,
     JSON.stringify(state),
@@ -112,9 +113,9 @@ export default async function handler(req, res) {
       return res.status(200).json(state);
     }
 
-    // =========================
-    // POST — foydalanuvchini ro'yxatga olish
-    // =========================
+    // ==========================================
+    // POST — Mini App ochgan foydalanuvchini yozish
+    // ==========================================
     if (req.method === 'POST') {
 
       const user = verifyTelegram(
@@ -127,109 +128,77 @@ export default async function handler(req, res) {
         });
       }
 
-      const body =
-        typeof req.body === 'string'
-          ? JSON.parse(req.body)
-          : req.body;
-
-      if (body?.action !== 'register') {
-        return res.status(400).json({
-          error: 'Invalid action'
-        });
-      }
-
       const state = await readState();
 
-      const userId = String(user.id);
+      const id = String(user.id);
 
-      const fullName = [
-        user.first_name,
-        user.last_name
-      ]
-        .filter(Boolean)
-        .join(' ');
-
-      const username = user.username
-        ? '@' + user.username
-        : '';
-
-      // Agar oldin ro'yxatdan o'tgan bo'lsa,
-      // uning jamoasini saqlab qolamiz
-      const oldUser = state.users[userId];
-
-      state.users[userId] = {
-        id: userId,
-        name: fullName || username || 'Nomaʼlum',
-        username: username,
-        team: oldUser?.team || null
+      state.users[id] = {
+        id: id,
+        username: user.username || '',
+        name: [user.first_name, user.last_name]
+          .filter(Boolean)
+          .join(' '),
+        team: state.users[id]?.team || ''
       };
 
-      await saveState(state);
+      await writeState(state);
 
       return res.status(200).json({
         ok: true,
-        user: {
-          name: state.users[userId].name,
-          username: state.users[userId].username,
-          team: state.users[userId].team
-        }
+        user: state.users[id]
       });
     }
 
     // =========================
-    // PUT — faqat admin uchun
+    // PUT — faqat admin
     // =========================
-    if (req.method === 'PUT') {
-
-      const user = verifyTelegram(
-        req.headers['x-telegram-init-data']
-      );
-
-      if (!user) {
-        return res.status(401).json({
-          error: 'Telegram authentication failed'
-        });
-      }
-
-      const admins = String(
-        process.env.ADMIN_IDS || ''
-      )
-        .split(',')
-        .map(x => x.trim())
-        .filter(Boolean);
-
-      if (!admins.includes(String(user.id))) {
-        return res.status(403).json({
-          error: 'Admin only'
-        });
-      }
-
-      const state =
-        typeof req.body === 'string'
-          ? JSON.parse(req.body)
-          : req.body;
-
-      if (!state || typeof state !== 'object') {
-        return res.status(400).json({
-          error: 'Invalid state'
-        });
-      }
-
-      // users yo'qolib ketmasligi uchun
-      if (!state.users) {
-        state.users = {};
-      }
-
-      const blob = await saveState(state);
-
-      return res.status(200).json({
-        ok: true,
-        url: blob.url
+    if (req.method !== 'PUT') {
+      return res.status(405).json({
+        error: 'Method not allowed'
       });
     }
 
-    return res.status(405).json({
-      error: 'Method not allowed'
+    const user = verifyTelegram(
+      req.headers['x-telegram-init-data']
+    );
+
+    if (!user) {
+      return res.status(401).json({
+        error: 'Telegram authentication failed'
+      });
+    }
+
+    const admins = String(process.env.ADMIN_IDS || '')
+      .split(',')
+      .map(x => x.trim())
+      .filter(Boolean);
+
+    if (!admins.includes(String(user.id))) {
+      return res.status(403).json({
+        error: 'Admin only'
+      });
+    }
+
+    const state =
+      typeof req.body === 'string'
+        ? JSON.parse(req.body)
+        : req.body;
+
+    if (!state || typeof state !== 'object') {
+      return res.status(400).json({
+        error: 'Invalid state'
+      });
+    }
+
+    if (!state.users) state.users = {};
+    if (!state.players) state.players = {};
+    if (!state.results) state.results = {};
+
+    const blob = await writeState(state);
+
+    return res.status(200).json({
+      ok: true,
+      url: blob.url
     });
 
   } catch (e) {
