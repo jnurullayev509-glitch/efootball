@@ -22,7 +22,44 @@ registerMe(); async function loadState(){try{const r=await fetch('/api/state',{c
 function show(id){document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===id))} document.querySelectorAll('.tab').forEach(x=>x.onclick=()=>show(x.dataset.tab));
 function opts(id,arr=TEAMS){let e=document.getElementById(id);e.innerHTML='';arr.forEach(x=>e.add(new Option(x,x)))} function init(){opts('pteam');for(let i=0;i<38;i++){round.add(new Option((i+1)+'-tur',i));rr.add(new Option((i+1)+'-tur',i))} round.onchange=renderRound;rr.onchange=fillResult;fillResult();render()}
 function fillResult(){let r=+rr.value, hs=FIXTURES[r].map(x=>x[0]), as=FIXTURES[r].map(x=>x[1]);opts('rh',hs);opts('ra',as)}
-async function assign(){if(!ADMIN)return alert('Admin huquqi kerak');let n=pname.value.trim(),t=pteam.value;if(!n)return alert('Ism kiriting');d.players[t]={name:n,id:pid.value.trim()};if(await save()){render();pname.value='';pid.value=''}}
+async function assignUser(id,team){
+  if(!ADMIN)return alert('Admin huquqi kerak');
+
+  if(!id||!team)return alert('Username va jamoani tanlang');
+
+  if(!d.users||!d.users[id]){
+    return alert('Ishtirokchi topilmadi');
+  }
+
+  const user=d.users[id];
+
+  const oldTeam=Object.keys(d.players).find(
+    t=>d.players[t]&&String(d.players[t].id)===String(id)
+  );
+
+  if(oldTeam&&oldTeam!==team){
+    delete d.players[oldTeam];
+  }
+
+  const existing=d.players[team];
+
+  if(existing&&String(existing.id)!==String(id)){
+    return alert('Bu jamoaga boshqa ishtirokchi biriktirilgan');
+  }
+
+  d.players[team]={
+    name:user.name||user.username||'Ishtirokchi',
+    id:String(id),
+    username:user.username||''
+  };
+
+  user.team=team;
+
+  if(await save()){
+    render();
+    alert('Jamoa muvaffaqiyatli biriktirildi');
+  }
+}
 async function result(){if(!ADMIN)return alert('Admin huquqi kerak');let r=+rr.value,h=rh.value,a=ra.value,x=+hs.value,y=+as.value;if(h===a||!Number.isInteger(x)||!Number.isInteger(y)||x<0||y<0)return alert('Natijani to‘g‘ri kiriting');d.results[r+'|'+h+'|'+a]={r,h,a,x,y};if(await save()){render();hs.value='';as.value=''}}
 function calc(){let s={};TEAMS.forEach(t=>s[t]={t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});Object.values(d.results).forEach(x=>{let h=s[x.h],a=s[x.a];h.p++;a.p++;h.gf+=x.x;h.ga+=x.y;a.gf+=x.y;a.ga+=x.x;if(x.x>x.y){h.w++;a.l++;h.pts+=3}else if(x.x<x.y){a.w++;h.l++;a.pts+=3}else{h.d++;a.d++;h.pts++;a.pts++}});return Object.values(s).map(x=>({...x,gd:x.gf-x.ga})).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf)}
 function renderTable(){standings.innerHTML=calc().map((x,i)=>`<tr><td>${i+1}</td><td><b>${x.t}</b></td><td>${x.p}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gf}</td><td>${x.ga}</td><td>${x.gd}</td><td><b>${x.pts}</b></td></tr>`).join('')}
