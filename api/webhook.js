@@ -1,0 +1,2 @@
+import {handleUpdate} from './bot.js';import {env} from './config.js';
+export default async function(req,res){if(req.method!=='POST')return res.status(200).json({ok:true});if(env.WEBHOOK_SECRET&&req.headers['x-telegram-bot-api-secret-token']!==env.WEBHOOK_SECRET)return res.status(403).json({ok:false});try{await handleUpdate(req.body);return res.status(200).json({ok:true});}catch(e){console.error(e);return res.status(200).json({ok:false,error:e.message});}}

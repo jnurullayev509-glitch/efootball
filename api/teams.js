@@ -1,0 +1,3 @@
+export const TEAMS = [
+['arsenal','Arsenal'],['aston-villa','Aston Villa'],['bournemouth','Bournemouth'],['brentford','Brentford'],['brighton','Brighton & Hove Albion'],['chelsea','Chelsea'],['coventry','Coventry City'],['crystal-palace','Crystal Palace'],['everton','Everton'],['fulham','Fulham'],['hull','Hull City'],['ipswich','Ipswich Town'],['leeds','Leeds United'],['liverpool','Liverpool'],['man-city','Manchester City'],['man-utd','Manchester United'],['newcastle','Newcastle United'],['nottingham-forest','Nottingham Forest'],['sunderland','Sunderland'],['tottenham','Tottenham Hotspur']
+].map(([slug,name])=>({slug,name,logo_url:null}));

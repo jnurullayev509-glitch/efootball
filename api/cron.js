@@ -1,0 +1,1 @@
+import {cron} from './bot.js';import {env} from './config.js';export default async function(req,res){if(env.CRON_SECRET&&req.headers.authorization!==`Bearer ${env.CRON_SECRET}`)return res.status(401).json({ok:false});try{return res.status(200).json(await cron())}catch(e){console.error(e);return res.status(500).json({ok:false,error:e.message})}}
